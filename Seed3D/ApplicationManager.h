@@ -16,7 +16,6 @@ public:
 	HWND getWindowHandle();
 	void Shutdown();
 
-	
 	bool quit;
 
 private:
