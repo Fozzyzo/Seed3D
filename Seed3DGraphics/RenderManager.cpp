@@ -1,10 +1,10 @@
 #include "RenderManager.h"
+#include "stdafx.h"
 
 namespace S3DGraphics
 {
-	GraphicsHandle* RenderManager::startUp()
+	void RenderManager::startUp()
 	{
-		return false;
 	}
 
 	void RenderManager::shutDown()

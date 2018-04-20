@@ -1,9 +1,9 @@
 #pragma once
 
-#ifdef RENDERMANAGER_EXPORTS
-#define RENDERMANAGER_API __declspec(dllexport)
+#ifdef SEED3DGRAPHICS_EXPORTS
+#define SEED3DGRAPHICS_API __declspec(dllexport)
 #else
-#define RENDERMANAGER_API __declspec(dllimport)
+#define SEED3DGRAPHICS_API __declspec(dllimport)
 #endif
 
 namespace S3DGraphics
@@ -11,7 +11,7 @@ namespace S3DGraphics
 	class RenderManager
 	{
 	public:
-		RenderManager* startUp();
+		void startUp();
 		void shutDown();
 	};
 }

@@ -1,5 +1,6 @@
 #pragma once
 #include <Windows.h>
+#include "RenderManager.h"
 
 class ApplicationManager
 {
@@ -14,7 +15,7 @@ public:
 	bool createApplicationWindow(LPCSTR window_text, int size_x, int size_y);
 	WNDCLASSEX getWindowClass();
 	HWND getWindowHandle();
-	void Shutdown();
+	void shutdown();
 
 	bool quit;
 

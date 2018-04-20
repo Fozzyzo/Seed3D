@@ -19,6 +19,8 @@ namespace S3DGraphics
 		bool initialize();
 
 	private:
+
+		IDXGISwapChain * m_swap_chain;
 		ID3D11Device* m_dx_device;
 		ID3D11DeviceContext* m_dx_device_context;
 		ID3D11RenderTargetView* m_render_target_view;

@@ -116,10 +116,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ApplicationManager.cpp" />
+    <ClCompile Include="GraphicsAPI.cpp" />
+    <ClCompile Include="RenderManager.cpp" />
     <ClCompile Include="Seed3DApplicationWin.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationManager.h" />
+    <ClInclude Include="GraphicsAPI.h" />
+    <ClInclude Include="RenderingSettings.h" />
+    <ClInclude Include="RenderManager.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

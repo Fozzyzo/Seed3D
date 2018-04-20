@@ -74,7 +74,7 @@ HWND ApplicationManager::getWindowHandle()
 	return m_window_handle;
 }
 
-void ApplicationManager::Shutdown()
+void ApplicationManager::shutdown()
 {
 	DestroyWindow(m_window_handle);
 	m_window_handle = NULL;
