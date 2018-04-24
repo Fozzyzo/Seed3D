@@ -20,6 +20,16 @@ GraphicsAPI::~GraphicsAPI()
 {
 }
 
+ID3D11Device* GraphicsAPI::getDxDevice()
+{
+	return m_dx_device;
+}
+
+ID3D11DeviceContext* GraphicsAPI::getDxDeviceContext()
+{
+	return m_dx_device_context;
+}
+
 bool GraphicsAPI::initialize(RenderingSettings rendering_settings)
 {
 	int error;
@@ -51,6 +61,7 @@ bool GraphicsAPI::initialize(RenderingSettings rendering_settings)
 	swap_chain_description.SampleDesc.Quality = 0;
 	swap_chain_description.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 	swap_chain_description.Flags = 0;
+	swap_chain_description.Windowed = true;
 
 	if (rendering_settings.vsync)
 	{
@@ -108,11 +119,13 @@ bool GraphicsAPI::initialize(RenderingSettings rendering_settings)
 	depth_stencil_description.StencilEnable = true;
 	depth_stencil_description.StencilReadMask = 0xFF;
 	depth_stencil_description.StencilWriteMask = 0xFF;
+
 	depth_stencil_description.FrontFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
 	depth_stencil_description.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_INCR;
 	depth_stencil_description.FrontFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
 	depth_stencil_description.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
-	depth_stencil_description.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
+
+	depth_stencil_description.BackFace.StencilFailOp = D3D11_STENCIL_OP_KEEP;
 	depth_stencil_description.BackFace.StencilDepthFailOp = D3D11_STENCIL_OP_DECR;
 	depth_stencil_description.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
 	depth_stencil_description.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
@@ -184,7 +197,8 @@ bool GraphicsAPI::initializeVideoCardInfo(float screen_height, float screen_widt
 	DXGI_ADAPTER_DESC dx_adapter_description;
 	int error;
 
-	if (FAILED(CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)&dx_factory)));
+
+	if(FAILED(CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)&dx_factory)))
 	{ return false;  }
 
 	if (FAILED(dx_factory->EnumAdapters(0, &dx_adapter)))
@@ -294,7 +308,7 @@ void GraphicsAPI::destroy()
 	return;
 }
 
-void GraphicsAPI::drawBuffer(float red, float green, float blue, float alpha)
+void GraphicsAPI::begin(float red, float green, float blue, float alpha)
 {
 	float colors[4];
 
@@ -310,7 +324,7 @@ void GraphicsAPI::drawBuffer(float red, float green, float blue, float alpha)
 	return;
 }
 
-void GraphicsAPI::swapBuffer()
+void GraphicsAPI::end()
 {
 	if (vsync)
 	{
@@ -321,5 +335,17 @@ void GraphicsAPI::swapBuffer()
 	{
 		m_swap_chain->Present(0, 0);
 	}
+}
+
+void GraphicsAPI::getProjectionMatrix(DirectX::XMMATRIX& world_matrix)
+{
+	world_matrix = m_world_matrix;
+	return;
+}
+
+void GraphicsAPI::getWorldMatrix(DirectX::XMMATRIX& projection_matrix)
+{
+	projection_matrix = m_projection_matrix;
+	return;
 }
 

@@ -1,8 +1,7 @@
 #pragma once
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "d3d11.lib")
-#pragma comment(lib, "d3dx11.lib")
-#pragma comment(lib, "d3dx10.lib")
+#pragma comment(lib, "D3DCompiler.lib")
 
 #include <dxgi.h>
 #include <d3dcommon.h>
@@ -15,10 +14,15 @@ class GraphicsAPI
 public:
 	GraphicsAPI();
 	~GraphicsAPI();
+	ID3D11Device* getDxDevice();
+	ID3D11DeviceContext* getDxDeviceContext();
 	bool initialize(struct RenderingSettings rendering_settings);
 	void destroy();
-	void drawBuffer(float red, float green, float blue, float alpha);
-	void swapBuffer();
+	void begin(float red, float green, float blue, float alpha);
+	void end();
+
+	void getProjectionMatrix(DirectX::XMMATRIX& view_matrix);
+	void getWorldMatrix(DirectX::XMMATRIX& view_matrix);
 
 private:
 

@@ -16,6 +16,7 @@ int WINAPI WinMain(HINSTANCE instance_handle, HINSTANCE previous_instance_handle
 	ShowWindow(application_manager.getWindowHandle(), cmd_show);
 
 	RenderingSettings settings;
+	settings.window_handle = application_manager.getWindowHandle();
 	settings.screen_height = 800;
 	settings.screen_width = 1280;
 	settings.screen_near = 0.1f;
@@ -25,17 +26,18 @@ int WINAPI WinMain(HINSTANCE instance_handle, HINSTANCE previous_instance_handle
 
 	while (!application_manager.quit)
 	{
-		if (PeekMessage(&message, NULL, 0, 0, PM_REMOVE));
+		if (PeekMessage(&message, NULL, 0, 0, PM_REMOVE))
 		{
 			TranslateMessage(&message);
 			DispatchMessage(&message);
-			render_manager.render();
 		}
 
 		if (message.message == WM_QUIT)
 		{
 			quit = true;
 		}
+
+		render_manager.render();
 	}
 	
 	render_manager.shutDown();

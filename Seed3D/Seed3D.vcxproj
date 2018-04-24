@@ -85,6 +85,15 @@
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
+    <PostBuildEvent>
+      <Command>echo "Copying assets to build folder"
+if not exist "$(OutDir)textures" mkdir $(OutDir)textures
+if not exist "$(OutDir)shaders" mkdir $(OutDir)shaders
+if not exist "$(OutDir)meshes" mkdir $(OutDir)meshes
+xcopy "$(ProjectDir)textures\*" "$(OutDir)textures" /Y
+xcopy "$(ProjectDir)meshes\*.obj" "$(OutDir)meshes" /Y
+xcopy "$(ProjectDir)shaders\*.hlsl" "$(OutDir)shaders" /Y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -116,15 +125,35 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ApplicationManager.cpp" />
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="GraphicsAPI.cpp" />
+    <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="RenderManager.cpp" />
     <ClCompile Include="Seed3DApplicationWin.cpp" />
+    <ClCompile Include="ShaderManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationManager.h" />
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="GraphicsAPI.h" />
+    <ClInclude Include="Mesh.h" />
     <ClInclude Include="RenderingSettings.h" />
     <ClInclude Include="RenderManager.h" />
+    <ClInclude Include="ShaderManager.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <MySourceFiles Include="$(ProjectDir)shaders\*.hlsl;$(ProjectDir)meshes\*.obj" />
+  </ItemGroup>
+  <Target Name="CopyShaders">
+    <Copy SourceFiles="@(MySourceFiles)" DestinationFolder="$(OutDir)" />
+  </Target>
+  <ItemGroup>
+    <FxCompile Include="..\x64\Debug\PixelShader.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="..\x64\Debug\VertexShader.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
