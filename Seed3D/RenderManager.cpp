@@ -23,10 +23,11 @@ bool RenderManager::startUp(RenderingSettings rendering_settings)
 	}
 
 	m_camera = new Camera();
-	m_camera->setPosition(0.0f, 0.0f, -10.0f);
+	m_camera->setPosition(0.0f, 0.0f, -5.0f);
 
 	m_mesh = new Mesh();
-	if (!m_mesh->initialize(m_dx_api->getDxDevice()))
+
+	if (!m_mesh->initialize(m_dx_api->getDxDevice(), m_dx_api->getDxDeviceContext(), (char*)"textures/metal_plate_color.tga"))
 	{
 		MessageBox(rendering_settings.window_handle, "Object initialization failed", "Error", MB_OK);
 		return false;
@@ -91,7 +92,7 @@ void RenderManager::render()
 
 	m_mesh->render(m_dx_api->getDxDeviceContext());
 
-	m_shader_manager->renderShader(m_dx_api->getDxDeviceContext(), m_mesh->getIndexCount(), world_matrix, view_matrix, projection_matrix);
+	m_shader_manager->renderShader(m_dx_api->getDxDeviceContext(), m_mesh->getIndexCount(), world_matrix, view_matrix, projection_matrix, m_mesh->getTexture());
 	
 	m_dx_api->end();
 

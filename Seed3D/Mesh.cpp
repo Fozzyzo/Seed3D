@@ -6,22 +6,31 @@ Mesh::Mesh()
 {
 	m_vertex_buffer = 0;
 	m_index_buffer = 0;
+	m_texture = 0;
 }
 
 Mesh::~Mesh()
 {
 }
 
-bool Mesh::initialize(ID3D11Device* dx_device)
+bool Mesh::initialize(ID3D11Device* dx_device, ID3D11DeviceContext* dx_device_context, char* filename)
 {
 	if (!initializeBuffers(dx_device))
-	{ return false; }
+	{ 
+		return false; 
+	}
+
+	if (!loadTexture(dx_device, dx_device_context, filename))
+	{
+		return false;
+	}
 
 	return true;
 }
 
 void Mesh::destroy()
 {
+	releaseTexture();
 	destroyBuffers();
 
 	return;
@@ -35,6 +44,11 @@ void Mesh::render(ID3D11DeviceContext* dx_device_context)
 int Mesh::getIndexCount()
 {
 	return m_index_count;
+}
+
+ID3D11ShaderResourceView * Mesh::getTexture()
+{
+	return m_texture->getTexture();
 }
 
 bool Mesh::initializeBuffers(ID3D11Device* dx_device)
@@ -52,15 +66,18 @@ bool Mesh::initializeBuffers(ID3D11Device* dx_device)
 	indices = new unsigned long[m_index_count];
 
 	vertices[0].position = DirectX::XMFLOAT3(-1.0f, -1.0f, 0.0f);
-	vertices[0].color = DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
+	vertices[0].color = DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	vertices[0].texture_coords = DirectX::XMFLOAT2(0.0f, 1.0f);
 	indices[0] = 0;
 
 	vertices[1].position = DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f);
-	vertices[1].color = DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
+	vertices[1].color = DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	vertices[1].texture_coords = DirectX::XMFLOAT2(0.5f, 0.0f);
 	indices[1] = 1;
 
 	vertices[2].position = DirectX::XMFLOAT3(1.0f, -1.0f, 0.0f);
-	vertices[2].color = DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
+	vertices[2].color = DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
+	vertices[2].texture_coords = DirectX::XMFLOAT2(1.0f, 1.0f);
 	indices[2] = 2;
 
 	vertex_buffer_description.Usage = D3D11_USAGE_DEFAULT;
@@ -132,6 +149,30 @@ void Mesh::renderBuffers(ID3D11DeviceContext* dx_device_context)
 	dx_device_context->IASetVertexBuffers(0, 1, &m_vertex_buffer, &stride, &offset);
 	dx_device_context->IASetIndexBuffer(m_index_buffer, DXGI_FORMAT_R32_UINT, 0);
 	dx_device_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	return;
+}
+
+bool Mesh::loadTexture(ID3D11Device* dx_device, ID3D11DeviceContext* dx_device_context, char* filename)
+{
+	m_texture = new Texture();
+
+	if (!m_texture->initialize(dx_device, dx_device_context, filename))
+	{
+		return false;
+	}
+
+	return true;
+}
+
+void Mesh::releaseTexture()
+{
+	if (m_texture)
+	{
+		m_texture->shutdown();
+		delete m_texture;
+		m_texture = 0;
+	}
 
 	return;
 }

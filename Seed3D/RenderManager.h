@@ -5,8 +5,6 @@
 #include "Mesh.h"
 #include "ShaderManager.h"
 
-typedef wchar_t WCHAR;
-
 class RenderManager
 {
 public:

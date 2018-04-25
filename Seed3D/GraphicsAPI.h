@@ -21,8 +21,8 @@ public:
 	void begin(float red, float green, float blue, float alpha);
 	void end();
 
-	void getProjectionMatrix(DirectX::XMMATRIX& view_matrix);
-	void getWorldMatrix(DirectX::XMMATRIX& view_matrix);
+	void getProjectionMatrix(DirectX::XMMATRIX& projection_matrix);
+	void getWorldMatrix(DirectX::XMMATRIX& world_matrix);
 
 private:
 

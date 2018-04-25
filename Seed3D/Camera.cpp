@@ -46,20 +46,34 @@ DirectX::XMFLOAT3 Camera::getRotation()
 void Camera::render()
 {
 	DirectX::XMVECTOR up;
+	DirectX::XMFLOAT3 up_float;
+
 	DirectX::XMVECTOR camera_position;
+	DirectX::XMFLOAT3 camera_position_float;
+
 	DirectX::XMVECTOR camera_focus_point;
+	DirectX::XMFLOAT3 camera_focus_point_float;
+
 	DirectX::XMMATRIX rotation_matrix;
-	float pitch = 0.0f;
-	float yaw = 0.0f;
-	float roll = 0.0f;
 
-	up = DirectX::XMLoadFloat3(new DirectX::XMFLOAT3(0.0f, 1.0f, 0.0f));
-	camera_position = DirectX::XMLoadFloat3(new DirectX::XMFLOAT3(m_positionX, m_positionY, m_positionZ));
-	camera_focus_point = DirectX::XMLoadFloat3(new DirectX::XMFLOAT3(0.0f, 0.0f, 1.0f));
+	up_float.x = 0.0f;
+	up_float.y = 1.0f;
+	up_float.z = 0.0f;
+	up = DirectX::XMLoadFloat3(&up_float);
 
-	pitch = m_rotationX * 0.0174532925f;
-	yaw = m_rotationY * 0.0174532925f;
-	roll = m_rotationZ * 0.0174532925f;
+	camera_position_float.x = m_positionX;
+	camera_position_float.y = m_positionY;
+	camera_position_float.z = m_positionZ;
+	camera_position = DirectX::XMLoadFloat3(&camera_position_float);
+
+	camera_focus_point_float.x = 0.0f;
+	camera_focus_point_float.y = 0.0f;
+	camera_focus_point_float.z = 1.0f;
+	camera_focus_point = DirectX::XMLoadFloat3(&camera_focus_point_float);
+
+	float pitch = m_rotationX * 0.0174532925f;
+	float yaw = m_rotationY * 0.0174532925f;
+	float roll = m_rotationZ * 0.0174532925f;
 
 	rotation_matrix = DirectX::XMMatrixRotationRollPitchYaw(pitch, yaw, roll);
 
@@ -68,6 +82,8 @@ void Camera::render()
 
 	camera_focus_point = DirectX::XMVectorAdd(camera_position, camera_focus_point);
 
+	m_view_matrix = DirectX::XMMatrixLookAtLH(camera_position, camera_focus_point, up);
+	
 	return;
 }
 

@@ -13,6 +13,15 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\Resource Files\Textures">
+      <UniqueIdentifier>{4736d782-a51a-4e61-b41d-a6194d1cd04b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Resource Files\Meshes">
+      <UniqueIdentifier>{b6ca0026-6c55-4d7c-9fc6-355fe4efba31}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Resource Files\Shader">
+      <UniqueIdentifier>{ac401c98-16b0-4f34-8daa-2e57b025e522}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Seed3DApplicationWin.cpp">
@@ -36,6 +45,9 @@
     <ClCompile Include="ShaderManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationManager.h">
@@ -56,16 +68,24 @@
     <ClInclude Include="ShaderManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Texture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="Camera.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="..\x64\Debug\PixelShader.hlsl">
-      <Filter>Header Files\Resource Files</Filter>
+    <FxCompile Include="shaders\PixelShader.hlsl">
+      <Filter>Header Files\Resource Files\Shader</Filter>
     </FxCompile>
-    <FxCompile Include="..\x64\Debug\VertexShader.hlsl">
-      <Filter>Header Files\Resource Files</Filter>
+    <FxCompile Include="shaders\VertexShader.hlsl">
+      <Filter>Header Files\Resource Files\Shader</Filter>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="meshes\teapot.obj">
+      <Filter>Header Files\Resource Files\Meshes</Filter>
+    </Object>
   </ItemGroup>
 </Project>

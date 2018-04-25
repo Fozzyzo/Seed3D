@@ -17,21 +17,21 @@ bool ShaderManager::initialize(ID3D11Device * dx_device, HWND window_handle)
 	ID3D10Blob* error_msg;
 	ID3D10Blob* vertex_shader_buffer;
 	ID3D10Blob* pixel_shader_buffer;
-	D3D11_INPUT_ELEMENT_DESC polygon_layout[2];
+	D3D11_INPUT_ELEMENT_DESC polygon_layout[3];
 	unsigned int element_count;
 	D3D11_BUFFER_DESC matrix_buffer_description;
+	D3D11_SAMPLER_DESC texture_sampler_description;
 
 	error_msg = 0;
 	vertex_shader_buffer = 0;
 	pixel_shader_buffer = 0;
-	
 	
 	if (FAILED(D3DCompileFromFile(L"shaders/VertexShader.hlsl", NULL, NULL, "vertexMain", "vs_5_0", 
 				D3D10_SHADER_ENABLE_STRICTNESS, 0, &vertex_shader_buffer, &error_msg)))
 	{
 		if (error_msg)
 		{
-			//printShaderError(error_msg, window_handle, L"VertexShader.hlsl");
+			printShaderError(error_msg, window_handle, (WCHAR*)"VertexShader.hlsl");
 		}
 
 		else
@@ -46,7 +46,7 @@ bool ShaderManager::initialize(ID3D11Device * dx_device, HWND window_handle)
 	{
 		if (error_msg)
 		{
-			//printShaderError(error_msg, window_handle, "PixelShader.hlsl");
+			printShaderError(error_msg, window_handle, (WCHAR*)"PixelShader.hlsl");
 		}
 
 		else
@@ -83,6 +83,14 @@ bool ShaderManager::initialize(ID3D11Device * dx_device, HWND window_handle)
 	polygon_layout[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 	polygon_layout[1].InstanceDataStepRate = 0;
 
+	polygon_layout[2].SemanticName = "TEXCOORD";
+	polygon_layout[2].SemanticIndex = 0;
+	polygon_layout[2].Format = DXGI_FORMAT_R32G32_FLOAT;
+	polygon_layout[2].InputSlot = 0;
+	polygon_layout[2].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+	polygon_layout[2].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+	polygon_layout[2].InstanceDataStepRate = 0;
+	
 	element_count = sizeof(polygon_layout) / sizeof(polygon_layout[1]);
 
 	if (FAILED(dx_device->CreateInputLayout(polygon_layout, element_count, vertex_shader_buffer->GetBufferPointer(), vertex_shader_buffer->GetBufferSize(), &m_layout)))
@@ -104,6 +112,25 @@ bool ShaderManager::initialize(ID3D11Device * dx_device, HWND window_handle)
 	matrix_buffer_description.StructureByteStride = 0;
 
 	if (FAILED(dx_device->CreateBuffer(&matrix_buffer_description, NULL, &m_matrix_buffer)))
+	{
+		return false;
+	}
+
+	texture_sampler_description.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	texture_sampler_description.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	texture_sampler_description.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	texture_sampler_description.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	texture_sampler_description.MipLODBias = 0.0f;
+	texture_sampler_description.MaxAnisotropy = 1;
+	texture_sampler_description.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
+	texture_sampler_description.BorderColor[0] = 0;
+	texture_sampler_description.BorderColor[1] = 0;
+	texture_sampler_description.BorderColor[2] = 0;
+	texture_sampler_description.BorderColor[3] = 0;
+	texture_sampler_description.MinLOD = 0;
+	texture_sampler_description.MaxLOD = D3D11_FLOAT32_MAX;
+
+	if (FAILED(dx_device->CreateSamplerState(&texture_sampler_description, &m_sampler_state)))
 	{
 		return false;
 	}
@@ -137,10 +164,18 @@ void ShaderManager::shutdown()
 		m_pixel_shader = 0;
 	}
 
+	if (m_sampler_state)
+	{
+		m_sampler_state->Release();
+		m_sampler_state = 0;
+	}
+
 	return;
 }
 
-bool ShaderManager::setShaderParameters(ID3D11DeviceContext* dx_device_context, DirectX::XMMATRIX world, DirectX::XMMATRIX view, DirectX::XMMATRIX projection)
+bool ShaderManager::setShaderParameters(ID3D11DeviceContext* dx_device_context, 
+	DirectX::XMMATRIX world, DirectX::XMMATRIX view, DirectX::XMMATRIX projection,
+	ID3D11ShaderResourceView* shader_resource_view)
 {
 	D3D11_MAPPED_SUBRESOURCE mapped_resource;
 	MatrixBufferData* matrix_data;
@@ -165,15 +200,16 @@ bool ShaderManager::setShaderParameters(ID3D11DeviceContext* dx_device_context, 
 
 	buffer_count = 0;
 	dx_device_context->VSSetConstantBuffers(buffer_count, 1, &m_matrix_buffer);
+	dx_device_context->PSSetShaderResources(0, 1, &shader_resource_view);
+
 	return true;
 }
 
 bool ShaderManager::renderShader(ID3D11DeviceContext* dx_device_context, int index_count,
-	DirectX::XMMATRIX world_matrix,
-	DirectX::XMMATRIX view_matrix,
-	DirectX::XMMATRIX projection_matrix)
+	DirectX::XMMATRIX world_matrix, DirectX::XMMATRIX view_matrix, DirectX::XMMATRIX projection_matrix,
+	ID3D11ShaderResourceView* shader_resource_view)
 {
-	if (!setShaderParameters(dx_device_context, world_matrix, view_matrix, projection_matrix))
+	if (!setShaderParameters(dx_device_context, world_matrix, view_matrix, projection_matrix, shader_resource_view))
 	{
 		return false;
 	}
@@ -181,7 +217,7 @@ bool ShaderManager::renderShader(ID3D11DeviceContext* dx_device_context, int ind
 	dx_device_context->IASetInputLayout(m_layout);
 	dx_device_context->VSSetShader(m_vertex_shader, NULL, 0);
 	dx_device_context->PSSetShader(m_pixel_shader, NULL, 0);
-
+	dx_device_context->PSGetSamplers(0, 1, &m_sampler_state);
 	dx_device_context->DrawIndexed(index_count, 0, 0);
 
 	return true;

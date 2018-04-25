@@ -131,6 +131,7 @@ xcopy "$(ProjectDir)shaders\*.hlsl" "$(OutDir)shaders" /Y</Command>
     <ClCompile Include="RenderManager.cpp" />
     <ClCompile Include="Seed3DApplicationWin.cpp" />
     <ClCompile Include="ShaderManager.cpp" />
+    <ClCompile Include="Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ApplicationManager.h" />
@@ -140,21 +141,27 @@ xcopy "$(ProjectDir)shaders\*.hlsl" "$(OutDir)shaders" /Y</Command>
     <ClInclude Include="RenderingSettings.h" />
     <ClInclude Include="RenderManager.h" />
     <ClInclude Include="ShaderManager.h" />
+    <ClInclude Include="Texture.h" />
   </ItemGroup>
   <ItemGroup>
     <MySourceFiles Include="$(ProjectDir)shaders\*.hlsl;$(ProjectDir)meshes\*.obj" />
   </ItemGroup>
-  <Target Name="CopyShaders">
-    <Copy SourceFiles="@(MySourceFiles)" DestinationFolder="$(OutDir)" />
-  </Target>
   <ItemGroup>
-    <FxCompile Include="..\x64\Debug\PixelShader.hlsl">
+    <FxCompile Include="shaders\PixelShader.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="..\x64\Debug\VertexShader.hlsl">
+    <FxCompile Include="shaders\VertexShader.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
   </ItemGroup>
+  <ItemGroup>
+    <Object Include="meshes\teapot.obj">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </Object>
+  </ItemGroup>
+  <Target Name="CopyShaders">
+    <Copy SourceFiles="@(MySourceFiles)" DestinationFolder="$(OutDir)" />
+  </Target>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
