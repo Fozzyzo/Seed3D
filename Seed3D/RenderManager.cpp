@@ -23,11 +23,11 @@ bool RenderManager::startUp(RenderingSettings rendering_settings)
 	}
 
 	m_camera = new Camera();
-	m_camera->setPosition(0.0f, 0.0f, -5.0f);
+	m_camera->setPosition(0.0f, 0.0f, -10.0f);
 
 	m_mesh = new Mesh();
 
-	if (!m_mesh->initialize(m_dx_api->getDxDevice(), m_dx_api->getDxDeviceContext(), (char*)"textures/metal_plate_color.tga"))
+	if (!m_mesh->initialize(m_dx_api->getDxDevice(), m_dx_api->getDxDeviceContext(), (char*)"textures/metal_plate_color.tga", (char*)"meshes/sphere_lowpoly.obj"))
 	{
 		MessageBox(rendering_settings.window_handle, "Object initialization failed", "Error", MB_OK);
 		return false;
@@ -97,5 +97,11 @@ void RenderManager::render()
 	m_dx_api->end();
 
 
+	return;
+}
+
+void RenderManager::handleInput(int mouse_x, int mouse_y)
+{
+	//m_camera->setRotation((800 - mouse_x * 0.10), (1280 - mouse_y * 0.10), 0);
 	return;
 }

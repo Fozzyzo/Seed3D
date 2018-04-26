@@ -70,7 +70,8 @@ void Camera::render()
 	camera_focus_point_float.y = 0.0f;
 	camera_focus_point_float.z = 1.0f;
 	camera_focus_point = DirectX::XMLoadFloat3(&camera_focus_point_float);
-
+	
+	m_rotationY += 0.5f;
 	float pitch = m_rotationX * 0.0174532925f;
 	float yaw = m_rotationY * 0.0174532925f;
 	float roll = m_rotationZ * 0.0174532925f;

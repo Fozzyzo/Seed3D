@@ -127,6 +127,7 @@ xcopy "$(ProjectDir)shaders\*.hlsl" "$(OutDir)shaders" /Y</Command>
     <ClCompile Include="ApplicationManager.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="GraphicsAPI.cpp" />
+    <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="RenderManager.cpp" />
     <ClCompile Include="Seed3DApplicationWin.cpp" />
@@ -137,6 +138,7 @@ xcopy "$(ProjectDir)shaders\*.hlsl" "$(OutDir)shaders" /Y</Command>
     <ClInclude Include="ApplicationManager.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="GraphicsAPI.h" />
+    <ClInclude Include="InputManager.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="RenderingSettings.h" />
     <ClInclude Include="RenderManager.h" />

@@ -1,4 +1,8 @@
 #pragma once
+#include <fstream>
+#include <string>
+#include <sstream>
+#include <vector>
 #include <d3d11.h>
 #include <DirectXMath.h>
 #include "Texture.h"
@@ -8,7 +12,7 @@ class Mesh
 public:
 	Mesh();
 	~Mesh();
-	bool initialize(ID3D11Device* dx_device, ID3D11DeviceContext* dx_device_context, char* filename);
+	bool initialize(ID3D11Device* dx_device, ID3D11DeviceContext* dx_device_context, char* texture_filename, char* mesh_filename);
 	void destroy();
 	void render(ID3D11DeviceContext* dx_device_context);
 	int getIndexCount();
@@ -18,7 +22,8 @@ private:
 	bool initializeBuffers(ID3D11Device* dx_device);
 	void destroyBuffers();
 	void renderBuffers(ID3D11DeviceContext* dx_device_context);
-	bool loadTexture(ID3D11Device* dx_device, ID3D11DeviceContext* dx_device_context, char*);
+	bool loadTexture(ID3D11Device* dx_device, ID3D11DeviceContext* dx_device_context, char* filename);
+	bool loadObj(char* filename);
 	void releaseTexture();
 
 	struct VertexData
@@ -30,8 +35,16 @@ private:
 
 	ID3D11Buffer* m_vertex_buffer;
 	ID3D11Buffer* m_index_buffer;
-	int m_vertex_count;
-	int m_index_count;
+	std::vector<DirectX::XMFLOAT3> m_vertices;
+	std::vector<DirectX::XMFLOAT2> m_uvs;
+	std::vector<DirectX::XMFLOAT3> m_normals;
+	/*
+		Indices :
+		[0] = vertex 
+		[1] = uv
+		[2] = normal
+	*/
+	std::vector<std::vector<int>> m_indices;
 
 	Texture* m_texture;
 };
