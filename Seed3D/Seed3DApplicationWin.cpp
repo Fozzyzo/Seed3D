@@ -25,6 +25,8 @@ int WINAPI WinMain(HINSTANCE instance_handle, HINSTANCE previous_instance_handle
 	settings.screen_depth = 1000.0f;
 	settings.vsync = true;
 
+	KeyboardPresses layout;
+
 	if (render_manager.startUp(settings) == false)
 	{
 		application_manager.quit = true;
@@ -56,7 +58,8 @@ int WINAPI WinMain(HINSTANCE instance_handle, HINSTANCE previous_instance_handle
 		}
 
 		input_manager.getMouseLocation(mouse_x, mouse_y);
-		render_manager.handleInput(mouse_x, mouse_y);
+		input_manager.getKeyPresses(layout);
+		render_manager.handleInput(mouse_x, mouse_y, layout);
 		render_manager.render();
 	}
 

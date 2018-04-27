@@ -13,7 +13,7 @@ public:
 	bool startUp(struct RenderingSettings rendering_settings);
 	void shutDown();
 	void render();
-	void handleInput(int mouse_x, int mouse_y);
+	void handleInput(int mouse_x, int mouse_y, struct KeyboardPresses layout);
 
 private:
 	GraphicsAPI* m_dx_api;

@@ -1,7 +1,6 @@
 #include "InputManager.h"
 
 
-
 InputManager::InputManager()
 {
 	m_direct_input = 0;
@@ -114,6 +113,60 @@ bool InputManager::isEscapePressed()
 	}
 
 	return false;
+}
+
+void InputManager::getKeyPresses(KeyboardPresses& keys)
+{
+	keys.a = false;
+	keys.w = false;
+	keys.d = false;
+	keys.s = false;
+	keys.arrow_up = false;
+	keys.arrow_left = false;
+	keys.arrow_down = false;
+	keys.arrow_right = false;
+
+	if (m_keyboard_state[DIK_W] & 0x80)
+	{
+		keys.w = true;
+	}
+
+	if (m_keyboard_state[DIK_A] & 0x80)
+	{
+		keys.a = true;
+	}
+
+	if (m_keyboard_state[DIK_S] & 0x80)
+	{
+		keys.s = true;
+	}
+
+	if (m_keyboard_state[DIK_D] & 0x80)
+	{
+		keys.d = true;
+	}
+
+	if (m_keyboard_state[DIK_UPARROW] & 0x80)
+	{
+		keys.arrow_up = true;
+	}
+
+	if (m_keyboard_state[DIK_LEFTARROW] & 0x80)
+	{
+		keys.arrow_left = true;
+	}
+
+	if (m_keyboard_state[DIK_RIGHTARROW] & 0x80)
+	{
+		keys.arrow_right = true;
+	}
+
+	if (m_keyboard_state[DIK_DOWNARROW] & 0x80)
+	{
+		keys.arrow_down = true;
+	}
+
+	return;
 }
 
 void InputManager::getMouseLocation(int& mouse_x, int& mouse_y)

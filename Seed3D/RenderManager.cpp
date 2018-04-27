@@ -27,7 +27,7 @@ bool RenderManager::startUp(RenderingSettings rendering_settings)
 
 	m_mesh = new Mesh();
 
-	if (!m_mesh->initialize(m_dx_api->getDxDevice(), m_dx_api->getDxDeviceContext(), (char*)"textures/metal_plate_color.tga", (char*)"meshes/sphere_lowpoly.obj"))
+	if (!m_mesh->initialize(m_dx_api->getDxDevice(), m_dx_api->getDxDeviceContext(), (char*)"textures/metal_plate_color.tga", (char*)"meshes/sphere.obj"))
 	{
 		MessageBox(rendering_settings.window_handle, "Object initialization failed", "Error", MB_OK);
 		return false;
@@ -100,8 +100,58 @@ void RenderManager::render()
 	return;
 }
 
-void RenderManager::handleInput(int mouse_x, int mouse_y)
+void RenderManager::handleInput(int mouse_x, int mouse_y, KeyboardPresses layout)
 {
-	//m_camera->setRotation((800 - mouse_x * 0.10), (1280 - mouse_y * 0.10), 0);
+	float velocity_x = 0;
+	float velocity_y = 0;
+	float velocity_z = 0;
+
+	float rotation_x = 0;
+	float rotation_y = 0;
+	float rotation_z = 0;
+
+	if (layout.a == true)
+	{	
+		velocity_x = -0.1f;
+	}
+
+	if (layout.d == true)
+	{
+		velocity_x = 0.1f;
+	}
+
+	if (layout.w == true)
+	{
+		velocity_z = 0.1f;
+	}
+
+	if (layout.s == true)
+	{
+		velocity_z = -0.1f;
+	}
+
+	if (layout.arrow_left == true)
+	{
+		rotation_y = -1.0f;
+	}
+
+	if (layout.arrow_right == true)
+	{
+		rotation_y = 1.0f;
+	}
+
+	if(layout.arrow_up == true)
+	{
+		rotation_x = -0.8f;
+	}
+
+	if (layout.arrow_down == true)
+	{
+		rotation_x = 0.8f;
+	}
+
+
+	m_camera->setVelocity(velocity_x, velocity_y, velocity_z);
+	m_camera->addRotation(rotation_x, rotation_y, 0);
 	return;
 }

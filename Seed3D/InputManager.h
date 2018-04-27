@@ -4,6 +4,7 @@
 #pragma comment(lib, "dxguid.lib")
 
 #include <dinput.h>
+#include "KeyboardPresses.h"
 
 class InputManager
 {
@@ -15,6 +16,7 @@ public:
 	bool handle();
 
 	bool isEscapePressed();
+	void getKeyPresses(struct KeyboardPresses& keys);
 	void getMouseLocation(int& mouse_x, int& mouse_y);
 
 private:

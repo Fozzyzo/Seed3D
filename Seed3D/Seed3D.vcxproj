@@ -144,6 +144,7 @@ xcopy "$(ProjectDir)shaders\*.hlsl" "$(OutDir)shaders" /Y</Command>
     <ClInclude Include="RenderManager.h" />
     <ClInclude Include="ShaderManager.h" />
     <ClInclude Include="Texture.h" />
+    <ClInclude Include="KeyboardPresses.h" />
   </ItemGroup>
   <ItemGroup>
     <MySourceFiles Include="$(ProjectDir)shaders\*.hlsl;$(ProjectDir)meshes\*.obj" />
