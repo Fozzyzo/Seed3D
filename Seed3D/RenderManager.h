@@ -4,6 +4,7 @@
 #include "Camera.h"
 #include "Mesh.h"
 #include "ShaderManager.h"
+#include "DirectionalLight.h"
 
 class RenderManager
 {
@@ -20,4 +21,5 @@ private:
 	Camera* m_camera;
 	Mesh* m_mesh;
 	ShaderManager* m_shader_manager;
+	DirectionalLight* m_light;
 };

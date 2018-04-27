@@ -125,6 +125,8 @@ void InputManager::getKeyPresses(KeyboardPresses& keys)
 	keys.arrow_left = false;
 	keys.arrow_down = false;
 	keys.arrow_right = false;
+	keys.space = false;
+	keys.left_shift = false;
 
 	if (m_keyboard_state[DIK_W] & 0x80)
 	{
@@ -164,6 +166,16 @@ void InputManager::getKeyPresses(KeyboardPresses& keys)
 	if (m_keyboard_state[DIK_DOWNARROW] & 0x80)
 	{
 		keys.arrow_down = true;
+	}
+
+	if (m_keyboard_state[DIK_SPACE] & 0x80)
+	{
+		keys.space = true;
+	}
+
+	if (m_keyboard_state[DIK_LSHIFT] & 0x80)
+	{
+		keys.left_shift = true;
 	}
 
 	return;

@@ -1,7 +1,5 @@
 #include "Mesh.h"
 
-
-
 Mesh::Mesh()
 {
 	m_vertex_buffer = 0;
@@ -81,6 +79,7 @@ bool Mesh::initializeBuffers(ID3D11Device* dx_device)
 		vertices[i].position = m_vertices[m_indices[i][0] - 1];
 		vertices[i].color = DirectX::XMFLOAT4(0.0f, 0.0f, 0.0f, 1.0f);
 		vertices[i].texture_coords = m_uvs[m_indices[i][1] - 1];
+		vertices[i].normal = m_normals[m_indices[i][2] - 1];
 		indices[i] = i;
 	}
 
@@ -135,8 +134,8 @@ void Mesh::destroyBuffers()
 
 	if (m_vertex_buffer)
 	{
-		m_index_buffer->Release();
-		m_index_buffer = 0;
+		m_vertex_buffer->Release();
+		m_vertex_buffer = 0;
 	}
 
 	return;

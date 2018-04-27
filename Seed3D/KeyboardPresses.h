@@ -10,4 +10,6 @@ struct KeyboardPresses
 	bool arrow_left;
 	bool arrow_right;
 	bool arrow_down;
+	bool space;
+	bool left_shift;
 };

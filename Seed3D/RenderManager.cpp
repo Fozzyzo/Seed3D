@@ -6,6 +6,7 @@ RenderManager::RenderManager()
 	m_camera = 0;
 	m_mesh = 0;
 	m_shader_manager = 0;
+	m_light = 0;
 }
 
 RenderManager::~RenderManager()
@@ -27,7 +28,14 @@ bool RenderManager::startUp(RenderingSettings rendering_settings)
 
 	m_mesh = new Mesh();
 
-	if (!m_mesh->initialize(m_dx_api->getDxDevice(), m_dx_api->getDxDeviceContext(), (char*)"textures/metal_plate_color.tga", (char*)"meshes/sphere.obj"))
+	m_light = new DirectionalLight();
+	m_light->setAmbientLight(0.3f, 0.3f, 0.3f, 1.0f);
+	m_light->setDiffuseColor(0.8f, 0.8f, 0.8f, 1.0f);
+	m_light->setDirection(-0.3f, 0.2f, -1.0f);
+	m_light->setSpecularColor(1.0f, 1.0f, 1.0f, 1.0f);
+	m_light->setSpecularPower(16.0f);
+
+	if (!m_mesh->initialize(m_dx_api->getDxDevice(), m_dx_api->getDxDeviceContext(), (char*)"textures/metal_plate_color.tga", (char*)"meshes/sphere_highpoly.obj"))
 	{
 		MessageBox(rendering_settings.window_handle, "Object initialization failed", "Error", MB_OK);
 		return false;
@@ -46,6 +54,12 @@ bool RenderManager::startUp(RenderingSettings rendering_settings)
 
 void RenderManager::shutDown()
 {
+	if (m_light)
+	{
+		delete m_light;
+		m_light = 0;
+	}
+
 	if (!m_shader_manager)
 	{
 		m_shader_manager->shutdown();
@@ -53,14 +67,14 @@ void RenderManager::shutDown()
 		m_shader_manager = 0;
 	}
 
-	if (!m_mesh)
+	if (m_mesh)
 	{
 		m_mesh->destroy();
 		delete m_mesh;
 		m_mesh = 0;
 	}
 
-	if (!m_camera)
+	if (m_camera)
 	{
 		delete m_camera;
 		m_camera = 0;
@@ -92,10 +106,11 @@ void RenderManager::render()
 
 	m_mesh->render(m_dx_api->getDxDeviceContext());
 
-	m_shader_manager->renderShader(m_dx_api->getDxDeviceContext(), m_mesh->getIndexCount(), world_matrix, view_matrix, projection_matrix, m_mesh->getTexture());
+	m_shader_manager->renderShader(m_dx_api->getDxDeviceContext(), m_mesh->getIndexCount(), world_matrix, view_matrix, projection_matrix, 
+		m_mesh->getTexture(), m_light->getDirection(), m_light->getAmbientLight(), m_light->getDiffuseColor(), m_camera->getPosition(),
+		m_light->getSpecularColor(), m_light->getSpecularStrength());
 	
 	m_dx_api->end();
-
 
 	return;
 }
@@ -128,6 +143,16 @@ void RenderManager::handleInput(int mouse_x, int mouse_y, KeyboardPresses layout
 	if (layout.s == true)
 	{
 		velocity_z = -0.1f;
+	}
+
+	if (layout.space == true)
+	{
+		velocity_y = 0.1f;
+	}
+
+	if (layout.left_shift == true)
+	{
+		velocity_y = -0.1f;
 	}
 
 	if (layout.arrow_left == true)

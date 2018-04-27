@@ -31,6 +31,7 @@ private:
 		DirectX::XMFLOAT3 position;
 		DirectX::XMFLOAT4 color;
 		DirectX::XMFLOAT2 texture_coords;
+		DirectX::XMFLOAT3 normal;
 	};
 
 	ID3D11Buffer* m_vertex_buffer;
