@@ -4,7 +4,7 @@ Mesh::Mesh()
 {
 	m_vertex_buffer = 0;
 	m_index_buffer = 0;
-	m_texture = 0;
+	m_material = 0;
 	m_vertices = {};
 	m_uvs = {};
 	m_normals = {};
@@ -14,7 +14,32 @@ Mesh::~Mesh()
 {
 }
 
-bool Mesh::initialize(ID3D11Device* dx_device, ID3D11DeviceContext* dx_device_context, char* texture_filename, char* mesh_filename)
+DirectX::XMFLOAT3 operator+ (DirectX::XMFLOAT3& f1, DirectX::XMFLOAT3& f2)
+{
+	return DirectX::XMFLOAT3(f1.x + f2.x, f1.y + f2.y, f1.z + f2.z);
+}
+
+DirectX::XMFLOAT2 operator+ (DirectX::XMFLOAT2& f1, DirectX::XMFLOAT2& f2)
+{
+	return DirectX::XMFLOAT2(f1.x + f2.x, f1.y + f2.y);
+}
+
+DirectX::XMFLOAT3 operator- (DirectX::XMFLOAT3& f1, DirectX::XMFLOAT3& f2)
+{
+	return DirectX::XMFLOAT3(f1.x - f2.x, f1.y - f2.y, f1.z - f2.z);
+}
+
+DirectX::XMFLOAT2 operator-(DirectX::XMFLOAT2 & f1, DirectX::XMFLOAT2 & f2)
+{
+	return DirectX::XMFLOAT2(f1.x - f2.x, f1.y - f2.y);
+}
+
+DirectX::XMFLOAT3 operator*(DirectX::XMFLOAT3& f1, float& f2)
+{
+	return DirectX::XMFLOAT3(f1.x * f2, f1.y * f2, f1.z * f2);
+}
+
+bool Mesh::initialize(ID3D11Device* dx_device, ID3D11DeviceContext* dx_device_context, char* mesh_filename, char* texture_filename, char* normal_texture_filename, float specularity)
 {
 	if (!loadObj(mesh_filename))
 	{
@@ -26,7 +51,7 @@ bool Mesh::initialize(ID3D11Device* dx_device, ID3D11DeviceContext* dx_device_co
 		return false; 
 	}
 
-	if (!loadTexture(dx_device, dx_device_context, texture_filename))
+	if (!loadMaterial(dx_device, dx_device_context, texture_filename, normal_texture_filename, specularity))
 	{
 		return false;
 	}
@@ -36,7 +61,7 @@ bool Mesh::initialize(ID3D11Device* dx_device, ID3D11DeviceContext* dx_device_co
 
 void Mesh::destroy()
 {
-	releaseTexture();
+	releaseMaterial();
 	destroyBuffers();
 
 	m_vertices.clear();
@@ -57,10 +82,11 @@ int Mesh::getIndexCount()
 	return m_indices.size();
 }
 
-ID3D11ShaderResourceView * Mesh::getTexture()
+ID3D11ShaderResourceView** Mesh::getMaterial()
 {
-	return m_texture->getTexture();
+	return m_material->getMaterial();
 }
+
 
 bool Mesh::initializeBuffers(ID3D11Device* dx_device)
 {
@@ -82,6 +108,8 @@ bool Mesh::initializeBuffers(ID3D11Device* dx_device)
 		vertices[i].normal = m_normals[m_indices[i][2] - 1];
 		indices[i] = i;
 	}
+
+	calculateTangents(vertices);
 
 	vertex_buffer_description.Usage = D3D11_USAGE_DEFAULT;
 	vertex_buffer_description.ByteWidth = sizeof(VertexData) * m_indices.size();
@@ -156,11 +184,11 @@ void Mesh::renderBuffers(ID3D11DeviceContext* dx_device_context)
 	return;
 }
 
-bool Mesh::loadTexture(ID3D11Device* dx_device, ID3D11DeviceContext* dx_device_context, char* filename)
+bool Mesh::loadMaterial(ID3D11Device* dx_device, ID3D11DeviceContext* dx_device_context, char* texture_filename, char* normals_filename, float specularity)
 {
-	m_texture = new Texture();
+	m_material = new Material();
 
-	if (!m_texture->initialize(dx_device, dx_device_context, filename))
+	if (!m_material->initialize(dx_device, dx_device_context, texture_filename, normals_filename, specularity))
 	{
 		return false;
 	}
@@ -235,13 +263,71 @@ bool Mesh::loadObj(char* filename)
 	return true;
 }
 
-void Mesh::releaseTexture()
+void Mesh::releaseMaterial()
 {
-	if (m_texture)
+	if (m_material)
 	{
-		m_texture->shutdown();
-		delete m_texture;
-		m_texture = 0;
+		m_material->destroy();
+		delete m_material;
+		m_material = 0;
+	}
+
+	return;
+}
+
+void Mesh::calculateTangents(VertexData*& vertices)
+{
+	DirectX::XMFLOAT3 delta_position1;
+	DirectX::XMFLOAT3 delta_position2;
+	DirectX::XMFLOAT2 delta_uv1;
+	DirectX::XMFLOAT2 delta_uv2;
+
+	DirectX::XMFLOAT3 tmp1;
+	DirectX::XMFLOAT3 tmp2;
+	DirectX::XMFLOAT3 tangent;
+	DirectX::XMFLOAT3 bitangent;
+	float length;
+
+	for (int i = 0; i < m_indices.size(); i += 3)
+	{
+		delta_position1 = vertices[i + 1].position - vertices[i].position;
+		delta_position2 = vertices[i + 2].position - vertices[i].position;
+
+		delta_uv1 = vertices[i + 1].texture_coords - vertices[i].texture_coords;
+		delta_uv2 = vertices[i + 2].texture_coords - vertices[i].texture_coords;
+
+		float r = 1.0f / ((delta_uv1.x * delta_uv2.y) - (delta_uv1.y * delta_uv2.x));
+		
+		//Calculate tangent
+		tmp1 = delta_position1 * delta_uv2.y;
+		tmp2 = delta_position2 * delta_uv1.y;
+		tangent = tmp1 - tmp2;
+		tangent = tangent * r;
+
+		//Normalize
+		length = sqrt((tangent.x * tangent.x) + (tangent.y * tangent.y) + (tangent.z * tangent.z));
+		tangent.x = tangent.x / length;
+		tangent.y = tangent.y / length;
+		tangent.z = tangent.z / length;
+
+		vertices[i].tangent = tangent;
+		vertices[i + 1].tangent = tangent;
+		vertices[i + 2].tangent = tangent;
+
+		//Calculate bitangent
+		tmp1 = delta_position2 * delta_uv1.x;
+		tmp2 = delta_position1 * delta_uv2.x;
+		bitangent = tmp1 - tmp2;
+		bitangent = bitangent * r;
+
+		length = sqrt((bitangent.x * bitangent.x) + (bitangent.y * bitangent.y) + (bitangent.z * bitangent.z));
+		bitangent.x = bitangent.x / length;
+		bitangent.y = bitangent.y / length;
+		bitangent.z = bitangent.z / length;
+
+		vertices[i].bitangent = bitangent;
+		vertices[i + 1].bitangent = bitangent;
+		vertices[i + 2].bitangent = bitangent;
 	}
 
 	return;

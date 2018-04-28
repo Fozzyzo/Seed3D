@@ -19,7 +19,7 @@ bool ShaderManager::initialize(ID3D11Device * dx_device, HWND window_handle)
 	ID3D10Blob* error_msg;
 	ID3D10Blob* vertex_shader_buffer;
 	ID3D10Blob* pixel_shader_buffer;
-	D3D11_INPUT_ELEMENT_DESC polygon_layout[4];
+	D3D11_INPUT_ELEMENT_DESC polygon_layout[6];
 	unsigned int element_count;
 	D3D11_BUFFER_DESC matrix_buffer_description;
 	D3D11_BUFFER_DESC camera_buffer_description;
@@ -102,6 +102,22 @@ bool ShaderManager::initialize(ID3D11Device * dx_device, HWND window_handle)
 	polygon_layout[3].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
 	polygon_layout[3].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
 	polygon_layout[3].InstanceDataStepRate = 0;
+
+	polygon_layout[4].SemanticName = "TANGENT";
+	polygon_layout[4].SemanticIndex = 0;
+	polygon_layout[4].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+	polygon_layout[4].InputSlot = 0;
+	polygon_layout[4].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+	polygon_layout[4].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+	polygon_layout[4].InstanceDataStepRate = 0;
+
+	polygon_layout[5].SemanticName = "BITANGENT";
+	polygon_layout[5].SemanticIndex = 0;
+	polygon_layout[5].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+	polygon_layout[5].InputSlot = 0;
+	polygon_layout[5].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+	polygon_layout[5].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+	polygon_layout[5].InstanceDataStepRate = 0;
 
 	element_count = sizeof(polygon_layout) / sizeof(polygon_layout[0]);
 
@@ -223,7 +239,7 @@ void ShaderManager::shutdown()
 
 bool ShaderManager::setShaderParameters(ID3D11DeviceContext* dx_device_context, 
 	DirectX::XMMATRIX world, DirectX::XMMATRIX view, DirectX::XMMATRIX projection,
-	ID3D11ShaderResourceView* shader_resource_view, DirectX::XMFLOAT3 light_direction,
+	ID3D11ShaderResourceView** shader_resource_view, DirectX::XMFLOAT3 light_direction,
 	DirectX::XMFLOAT4 ambient_light, DirectX::XMFLOAT4 diffure_color, 
 	DirectX::XMFLOAT3 camera_position, DirectX::XMFLOAT4 specular_color, float specular_strength)
 {
@@ -252,7 +268,6 @@ bool ShaderManager::setShaderParameters(ID3D11DeviceContext* dx_device_context,
 
 	buffer_count = 0;
 	dx_device_context->VSSetConstantBuffers(buffer_count, 1, &m_matrix_buffer);
-	dx_device_context->PSSetShaderResources(0, 1, &shader_resource_view);
 
 	if (FAILED(dx_device_context->Map(m_camera_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped_resource)))
 	{
@@ -268,7 +283,6 @@ bool ShaderManager::setShaderParameters(ID3D11DeviceContext* dx_device_context,
 
 	buffer_count = 1;
 	dx_device_context->VSSetConstantBuffers(buffer_count, 1, &m_camera_buffer);
-	dx_device_context->PSSetShaderResources(0, 1, &shader_resource_view);
 
 	if (FAILED(dx_device_context->Map(m_light_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped_resource)))
 	{
@@ -287,12 +301,13 @@ bool ShaderManager::setShaderParameters(ID3D11DeviceContext* dx_device_context,
 
 	buffer_count = 0;
 	dx_device_context->PSSetConstantBuffers(buffer_count, 1, &m_light_buffer);
+	dx_device_context->PSSetShaderResources(0, 2, shader_resource_view);
 	return true;
 }
 
 bool ShaderManager::renderShader(ID3D11DeviceContext* dx_device_context, int index_count,
 	DirectX::XMMATRIX world_matrix, DirectX::XMMATRIX view_matrix, DirectX::XMMATRIX projection_matrix,
-	ID3D11ShaderResourceView* shader_resource_view, DirectX::XMFLOAT3 light_direction, DirectX::XMFLOAT4 ambient_light,
+	ID3D11ShaderResourceView** shader_resource_view, DirectX::XMFLOAT3 light_direction, DirectX::XMFLOAT4 ambient_light,
 	DirectX::XMFLOAT4 diffuse_light, DirectX::XMFLOAT3 camera_position, DirectX::XMFLOAT4 specular_color, float specular_strength)
 {
 	if (!setShaderParameters(dx_device_context, world_matrix, view_matrix, projection_matrix, 

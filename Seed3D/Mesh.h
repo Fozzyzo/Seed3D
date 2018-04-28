@@ -5,26 +5,34 @@
 #include <vector>
 #include <d3d11.h>
 #include <DirectXMath.h>
-#include "Texture.h"
+#include "Material.h"
 
 class Mesh
 {
+
 public:
 	Mesh();
 	~Mesh();
-	bool initialize(ID3D11Device* dx_device, ID3D11DeviceContext* dx_device_context, char* texture_filename, char* mesh_filename);
+	bool initialize(ID3D11Device* dx_device, ID3D11DeviceContext* dx_device_context, char* mesh_filename, char* texture_filename, char* normals_filename, float specularity);
 	void destroy();
 	void render(ID3D11DeviceContext* dx_device_context);
 	int getIndexCount();
-	ID3D11ShaderResourceView* getTexture();
-
+	ID3D11ShaderResourceView** getMaterial();
+	
 private:
+
+	friend DirectX::XMFLOAT3 operator+ (DirectX::XMFLOAT3& f1, DirectX::XMFLOAT3& f2);
+	friend DirectX::XMFLOAT2 operator+ (DirectX::XMFLOAT2& f1, DirectX::XMFLOAT2& f2);
+	friend DirectX::XMFLOAT3 operator- (DirectX::XMFLOAT3& f1, DirectX::XMFLOAT3& f2);
+	friend DirectX::XMFLOAT2 operator- (DirectX::XMFLOAT2& f1, DirectX::XMFLOAT2& f2);
+	friend DirectX::XMFLOAT3 operator*(DirectX::XMFLOAT3& f1, float& f2);
+
 	bool initializeBuffers(ID3D11Device* dx_device);
 	void destroyBuffers();
 	void renderBuffers(ID3D11DeviceContext* dx_device_context);
-	bool loadTexture(ID3D11Device* dx_device, ID3D11DeviceContext* dx_device_context, char* filename);
+	bool loadMaterial(ID3D11Device* dx_device, ID3D11DeviceContext* dx_device_context, char* texture_filename, char* normals_filename, float specularity);
 	bool loadObj(char* filename);
-	void releaseTexture();
+	void releaseMaterial();
 
 	struct VertexData
 	{
@@ -32,7 +40,11 @@ private:
 		DirectX::XMFLOAT4 color;
 		DirectX::XMFLOAT2 texture_coords;
 		DirectX::XMFLOAT3 normal;
+		DirectX::XMFLOAT3 tangent;
+		DirectX::XMFLOAT3 bitangent;
 	};
+
+	void calculateTangents(struct VertexData*& vertices);
 
 	ID3D11Buffer* m_vertex_buffer;
 	ID3D11Buffer* m_index_buffer;
@@ -46,7 +58,6 @@ private:
 		[2] = normal
 	*/
 	std::vector<std::vector<int>> m_indices;
-
-	Texture* m_texture;
+	Material* m_material;
 };
 

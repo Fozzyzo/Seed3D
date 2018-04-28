@@ -15,7 +15,7 @@ public:
 	void shutdown();
 	bool renderShader(ID3D11DeviceContext* dx_device_context, int index_count, 
 		DirectX::XMMATRIX world_matrix, DirectX::XMMATRIX view_matrix, 
-		DirectX::XMMATRIX projection_matrix, ID3D11ShaderResourceView* shader_resource_view,
+		DirectX::XMMATRIX projection_matrix, ID3D11ShaderResourceView** shader_resource_view,
 		DirectX::XMFLOAT3 light_direction, DirectX::XMFLOAT4 ambient_light, DirectX::XMFLOAT4 diffuse_light,
 		DirectX::XMFLOAT3 camera_position, DirectX::XMFLOAT4 specular_color, float specular_strength);
 
@@ -44,7 +44,7 @@ private:
 	};
 
 	bool setShaderParameters(ID3D11DeviceContext* dx_device_context, DirectX::XMMATRIX world, 
-		DirectX::XMMATRIX projection, DirectX::XMMATRIX view, ID3D11ShaderResourceView* shader_resource_view,
+		DirectX::XMMATRIX projection, DirectX::XMMATRIX view, ID3D11ShaderResourceView** shader_resource_view,
 		DirectX::XMFLOAT3 light_direction, DirectX::XMFLOAT4 ambient_light, DirectX::XMFLOAT4 diffuse_light,
 		DirectX::XMFLOAT3 camera_position, DirectX::XMFLOAT4 specular_color, float specular_strength);
 

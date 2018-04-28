@@ -1,19 +1,19 @@
-#include "Texture.h"
+#include "Material.h"
 
 
 
-Texture::Texture()
+Material::Material()
 {
 	m_targa_data = 0;
-	m_texture = 0;
-	m_texture_view = 0;
+	m_material[0] = 0;
+	m_material[1] = 0;
 }
 
-Texture::~Texture()
+Material::~Material()
 {
 }
 
-bool Texture::initialize(ID3D11Device * dx_device, ID3D11DeviceContext * dx_device_context, char * filename)
+bool Material::initialize(ID3D11Device* dx_device, ID3D11DeviceContext* dx_device_context, char* color_texture_filename, char* normal_texture_filename, float specularity)
 {
 	int height;
 	int width;
@@ -21,11 +21,11 @@ bool Texture::initialize(ID3D11Device * dx_device, ID3D11DeviceContext * dx_devi
 	unsigned int row_pitch;
 	D3D11_SHADER_RESOURCE_VIEW_DESC shader_resource_view_description;
 
-	if (!loadTarga(filename, width, height))
+	if (!loadTarga(color_texture_filename, width, height))
 	{
 		return false;
 	}
-	
+
 	ZeroMemory(&texture_description, sizeof(texture_description));
 
 	texture_description.Height = height;
@@ -47,18 +47,42 @@ bool Texture::initialize(ID3D11Device * dx_device, ID3D11DeviceContext * dx_devi
 
 	row_pitch = (width * 4) * sizeof(unsigned char);
 	dx_device_context->UpdateSubresource(m_texture, 0, NULL, m_targa_data, row_pitch, 0);
+
+	//Load normal texture data
+
+	if (!loadTarga(normal_texture_filename, width, height))
+	{
+		return false;
+	}
+
+	if (FAILED(dx_device->CreateTexture2D(&texture_description, NULL, &m_normal)))
+	{
+		return false;
+	}
 	
+	row_pitch = (width * 4) * sizeof(unsigned char);
+	dx_device_context->UpdateSubresource(m_normal, 0, NULL, m_targa_data, row_pitch, 0);
+
 	shader_resource_view_description.Format = texture_description.Format;
 	shader_resource_view_description.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 	shader_resource_view_description.Texture2D.MostDetailedMip = 0;
 	shader_resource_view_description.Texture2D.MipLevels = -1;
 
-	if (FAILED(dx_device->CreateShaderResourceView(m_texture, &shader_resource_view_description, &m_texture_view)))
+	if (FAILED(dx_device->CreateShaderResourceView(m_texture, &shader_resource_view_description, &m_material[0])))
 	{
 		return false;
 	}
 
-	dx_device_context->GenerateMips(m_texture_view);
+	dx_device_context->GenerateMips(m_material[0]);
+
+	if (FAILED(dx_device->CreateShaderResourceView(m_normal, &shader_resource_view_description, &m_material[1])))
+	{
+		return false;
+	}
+
+	dx_device_context->GenerateMips(m_material[1]);
+
+	m_specularity = specularity;
 
 	delete[] m_targa_data;
 	m_targa_data = 0;
@@ -66,12 +90,24 @@ bool Texture::initialize(ID3D11Device * dx_device, ID3D11DeviceContext * dx_devi
 	return true;
 }
 
-void Texture::shutdown()
+void Material::destroy()
 {
-	if (m_texture_view)
+	if (m_material[1])
 	{
-		m_texture_view->Release();
-		m_texture_view = 0;
+		m_material[1]->Release();
+		m_material[1] = 0;
+	}
+
+	if (m_material[0])
+	{
+		m_material[0]->Release();
+		m_material[0] = 0;
+	}
+
+	if (m_normal)
+	{
+		m_normal->Release();
+		m_normal = 0;
 	}
 
 	if (m_texture)
@@ -79,22 +115,14 @@ void Texture::shutdown()
 		m_texture->Release();
 		m_texture = 0;
 	}
-
-	if (m_targa_data)
-	{
-		delete[] m_targa_data;
-		m_targa_data = 0;
-	}
-
-	return;
 }
 
-ID3D11ShaderResourceView * Texture::getTexture()
+ID3D11ShaderResourceView** Material::getMaterial()
 {
-	return m_texture_view;
+	return m_material;
 }
 
-bool Texture::loadTarga(char* filename, int& width, int& height)
+bool Material::loadTarga(char* filename, int& width, int& height)
 {
 	int error;
 	int bpp;
@@ -170,3 +198,4 @@ bool Texture::loadTarga(char* filename, int& width, int& height)
 
 	return true;
 }
+

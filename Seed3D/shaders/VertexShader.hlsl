@@ -17,6 +17,8 @@ struct VertexData
 	float4 color : COLOR;
 	float2 texture_coord : TEXCOORD0;
 	float3 normal : NORMAL;
+	float3 tangent : TANGENT;
+	float3 bitangent : BITANGENT;
 };
 
 struct PixelData
@@ -26,6 +28,8 @@ struct PixelData
 	float2 texture_coord : TEXCOORD0;
 	float3 normal : NORMAL;
 	float3 view_direction : TEXCOORD1;
+	float3 tangent : TANGENT;
+	float3 bitangent : BITANGENT;
 };
 
 PixelData vertexMain(VertexData vertex_input)
@@ -43,6 +47,12 @@ PixelData vertexMain(VertexData vertex_input)
 
 	pixel_output.normal = mul(vertex_input.normal, (float3x3)world_matrix);
 	pixel_output.normal = normalize(pixel_output.normal);
+
+	pixel_output.tangent = mul(vertex_input.tangent, (float3x3)world_matrix);
+	pixel_output.tangent = normalize(pixel_output.tangent);
+
+	pixel_output.bitangent = mul(vertex_input.bitangent, (float3x3)world_matrix);
+	pixel_output.bitangent = normalize(pixel_output.bitangent);
 
 	vertex_position = mul(vertex_input.position, world_matrix);
 	pixel_output.view_direction = camera_position.xyz - vertex_position.xyz;
