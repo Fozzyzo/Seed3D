@@ -39,7 +39,7 @@ DirectX::XMFLOAT3 operator*(DirectX::XMFLOAT3& f1, float& f2)
 	return DirectX::XMFLOAT3(f1.x * f2, f1.y * f2, f1.z * f2);
 }
 
-bool Mesh::initialize(ID3D11Device* dx_device, ID3D11DeviceContext* dx_device_context, char* mesh_filename, char* texture_filename, char* normal_texture_filename, float specularity)
+bool Mesh::initialize(ID3D11Device* dx_device, ID3D11DeviceContext* dx_device_context, char* mesh_filename, char* texture_filename, char* normal_texture_filename, char* specular_filename)
 {
 	if (!loadObj(mesh_filename))
 	{
@@ -51,7 +51,7 @@ bool Mesh::initialize(ID3D11Device* dx_device, ID3D11DeviceContext* dx_device_co
 		return false; 
 	}
 
-	if (!loadMaterial(dx_device, dx_device_context, texture_filename, normal_texture_filename, specularity))
+	if (!loadMaterial(dx_device, dx_device_context, texture_filename, normal_texture_filename, specular_filename))
 	{
 		return false;
 	}
@@ -80,6 +80,16 @@ void Mesh::render(ID3D11DeviceContext* dx_device_context)
 int Mesh::getIndexCount()
 {
 	return m_indices.size();
+}
+
+void Mesh::setPosition(float x, float y, float z)
+{
+	m_position = DirectX::XMMatrixTranslation(x, y, z);
+}
+
+DirectX::XMMATRIX Mesh::getPosition()
+{
+	return m_position;
 }
 
 ID3D11ShaderResourceView** Mesh::getMaterial()
@@ -184,11 +194,11 @@ void Mesh::renderBuffers(ID3D11DeviceContext* dx_device_context)
 	return;
 }
 
-bool Mesh::loadMaterial(ID3D11Device* dx_device, ID3D11DeviceContext* dx_device_context, char* texture_filename, char* normals_filename, float specularity)
+bool Mesh::loadMaterial(ID3D11Device* dx_device, ID3D11DeviceContext* dx_device_context, char* texture_filename, char* normals_filename, char* specular_filename)
 {
 	m_material = new Material();
 
-	if (!m_material->initialize(dx_device, dx_device_context, texture_filename, normals_filename, specularity))
+	if (!m_material->initialize(dx_device, dx_device_context, texture_filename, normals_filename, specular_filename))
 	{
 		return false;
 	}

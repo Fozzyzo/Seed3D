@@ -7,7 +7,7 @@ class Material
 public:
 	Material();
 	~Material();
-	bool initialize(ID3D11Device* dx_device, ID3D11DeviceContext* dx_device_context, char* color_texture_filename, char* normal_texture_filename, float specularity);
+	bool initialize(ID3D11Device* dx_device, ID3D11DeviceContext* dx_device_context, char* color_texture_filename, char* normal_texture_filename, char* specular_texture_filename);
 	void destroy();
 	ID3D11ShaderResourceView** getMaterial();
 
@@ -27,6 +27,7 @@ private:
 	float m_specularity;
 	ID3D11Texture2D* m_texture;
 	ID3D11Texture2D* m_normal;
-	ID3D11ShaderResourceView* m_material[2];
+	ID3D11Texture2D* m_specular;
+	ID3D11ShaderResourceView* m_material[3];
 };
 

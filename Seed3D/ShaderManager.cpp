@@ -301,7 +301,7 @@ bool ShaderManager::setShaderParameters(ID3D11DeviceContext* dx_device_context,
 
 	buffer_count = 0;
 	dx_device_context->PSSetConstantBuffers(buffer_count, 1, &m_light_buffer);
-	dx_device_context->PSSetShaderResources(0, 2, shader_resource_view);
+	dx_device_context->PSSetShaderResources(0, 3, shader_resource_view);
 	return true;
 }
 

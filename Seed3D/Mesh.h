@@ -13,10 +13,12 @@ class Mesh
 public:
 	Mesh();
 	~Mesh();
-	bool initialize(ID3D11Device* dx_device, ID3D11DeviceContext* dx_device_context, char* mesh_filename, char* texture_filename, char* normals_filename, float specularity);
+	bool initialize(ID3D11Device* dx_device, ID3D11DeviceContext* dx_device_context, char* mesh_filename, char* texture_filename, char* normals_filename, char* specular_filename);
 	void destroy();
 	void render(ID3D11DeviceContext* dx_device_context);
 	int getIndexCount();
+	void setPosition(float x, float y, float z);
+	DirectX::XMMATRIX getPosition();
 	ID3D11ShaderResourceView** getMaterial();
 	
 private:
@@ -30,7 +32,7 @@ private:
 	bool initializeBuffers(ID3D11Device* dx_device);
 	void destroyBuffers();
 	void renderBuffers(ID3D11DeviceContext* dx_device_context);
-	bool loadMaterial(ID3D11Device* dx_device, ID3D11DeviceContext* dx_device_context, char* texture_filename, char* normals_filename, float specularity);
+	bool loadMaterial(ID3D11Device* dx_device, ID3D11DeviceContext* dx_device_context, char* texture_filename, char* normals_filename, char* specular_filename);
 	bool loadObj(char* filename);
 	void releaseMaterial();
 
@@ -60,6 +62,6 @@ private:
 	std::vector<std::vector<int>> m_indices;
 	Material* m_material;
 
-	DirectX::XMFLOAT3 m_position;
+	DirectX::XMMATRIX m_position;
 };
 

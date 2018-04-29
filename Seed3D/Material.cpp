@@ -7,13 +7,14 @@ Material::Material()
 	m_targa_data = 0;
 	m_material[0] = 0;
 	m_material[1] = 0;
+	m_material[2] = 0;
 }
 
 Material::~Material()
 {
 }
 
-bool Material::initialize(ID3D11Device* dx_device, ID3D11DeviceContext* dx_device_context, char* color_texture_filename, char* normal_texture_filename, float specularity)
+bool Material::initialize(ID3D11Device* dx_device, ID3D11DeviceContext* dx_device_context, char* color_texture_filename, char* normal_texture_filename, char* specular_texture_filename)
 {
 	int height;
 	int width;
@@ -63,6 +64,21 @@ bool Material::initialize(ID3D11Device* dx_device, ID3D11DeviceContext* dx_devic
 	row_pitch = (width * 4) * sizeof(unsigned char);
 	dx_device_context->UpdateSubresource(m_normal, 0, NULL, m_targa_data, row_pitch, 0);
 
+	//Load specular texture data
+
+	if (!loadTarga(specular_texture_filename, width, height))
+	{
+		return false;
+	}
+
+	if (FAILED(dx_device->CreateTexture2D(&texture_description, NULL, &m_specular)))
+	{
+		return false;
+	}
+
+	row_pitch = (width * 4) * sizeof(unsigned char);
+	dx_device_context->UpdateSubresource(m_specular, 0, NULL, m_targa_data, row_pitch, 0);
+
 	shader_resource_view_description.Format = texture_description.Format;
 	shader_resource_view_description.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 	shader_resource_view_description.Texture2D.MostDetailedMip = 0;
@@ -82,7 +98,13 @@ bool Material::initialize(ID3D11Device* dx_device, ID3D11DeviceContext* dx_devic
 
 	dx_device_context->GenerateMips(m_material[1]);
 
-	m_specularity = specularity;
+	if (FAILED(dx_device->CreateShaderResourceView(m_specular, &shader_resource_view_description, &m_material[2])))
+	{
+		return false;
+	}
+
+	dx_device_context->GenerateMips(m_material[2]);
+
 
 	delete[] m_targa_data;
 	m_targa_data = 0;
@@ -92,6 +114,12 @@ bool Material::initialize(ID3D11Device* dx_device, ID3D11DeviceContext* dx_devic
 
 void Material::destroy()
 {
+	if (m_material[2])
+	{
+		m_material[2]->Release();
+		m_material[2] = 0;
+	}
+
 	if (m_material[1])
 	{
 		m_material[1]->Release();

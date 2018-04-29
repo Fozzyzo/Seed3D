@@ -1,4 +1,4 @@
-Texture2D texture2d[2];
+Texture2D texture2d[3];
 SamplerState sample_type;
 
 cbuffer LightBuffer
@@ -25,6 +25,7 @@ float4 pixelMain(PixelData pixel_input) : SV_TARGET
 {
 	float4 texture_color;
 	float4 bump_map;
+	float4 specular_intensity;
 	float3 bump_normal;
 	float3 light_dir;
 	float light_intensity;
@@ -42,18 +43,23 @@ float4 pixelMain(PixelData pixel_input) : SV_TARGET
 	pixel_input.color += ambient_light;
 
 	specular = float4(0.0f, 0.0f, 0.0f, 0.0f);
+	specular_intensity = float4(0.0f, 0.0f, 0.0f, 0.0f);
 	
 	light_dir = -light_direction;
 	light_intensity = saturate(dot(bump_normal, light_dir));
 	
 	if (light_intensity > 0.0f)
 	{
+		specular_intensity = texture2d[2].Sample(sample_type, (pixel_input.texture_coord));
+
 		pixel_input.color += (diffuse_color * light_intensity);
 		pixel_input.color = saturate(pixel_input.color);
 		
 		reflection = normalize(2 * light_intensity * bump_normal - light_dir);
 
 		specular = pow(saturate(dot(reflection, pixel_input.view_direction)), specular_strength);
+
+		specular = specular * specular_intensity;
 	}
 
 	pixel_input.color = pixel_input.color * texture_color;

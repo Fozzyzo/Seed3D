@@ -20,6 +20,7 @@ private:
 	GraphicsAPI* m_dx_api;
 	Camera* m_camera;
 	Mesh* m_mesh;
+	Mesh* m_mesh2;
 	ShaderManager* m_shader_manager;
 	DirectionalLight* m_light;
 };

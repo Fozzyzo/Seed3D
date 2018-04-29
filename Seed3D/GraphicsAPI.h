@@ -22,7 +22,6 @@ public:
 	void end();
 
 	void getProjectionMatrix(DirectX::XMMATRIX& projection_matrix);
-	void getWorldMatrix(DirectX::XMMATRIX& world_matrix);
 
 private:
 

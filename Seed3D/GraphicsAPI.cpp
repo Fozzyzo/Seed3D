@@ -181,7 +181,6 @@ bool GraphicsAPI::initialize(RenderingSettings rendering_settings)
 
 	//Matrix initialization
 	m_projection_matrix = DirectX::XMMatrixPerspectiveFovLH(field_of_view, screen_aspect, rendering_settings.screen_near, rendering_settings.screen_depth);
-	m_world_matrix = DirectX::XMMatrixIdentity();
 	m_orthographic_matrix = DirectX::XMMatrixOrthographicLH((float)rendering_settings.screen_width, (float)rendering_settings.screen_height, rendering_settings.screen_near, rendering_settings.screen_depth);
 
 	return true;
@@ -342,10 +341,3 @@ void GraphicsAPI::getProjectionMatrix(DirectX::XMMATRIX& projection_matrix)
 	projection_matrix = m_projection_matrix;
 	return;
 }
-
-void GraphicsAPI::getWorldMatrix(DirectX::XMMATRIX& world_matrix)
-{
-	world_matrix= m_world_matrix;
-	return;
-}
-
