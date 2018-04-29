@@ -59,5 +59,7 @@ private:
 	*/
 	std::vector<std::vector<int>> m_indices;
 	Material* m_material;
+
+	DirectX::XMFLOAT3 m_position;
 };
 

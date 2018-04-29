@@ -29,13 +29,13 @@ bool RenderManager::startUp(RenderingSettings rendering_settings)
 	m_mesh = new Mesh();
 
 	m_light = new DirectionalLight();
-	m_light->setAmbientLight(0.15f, 0.15f, 0.15f, 1.0f);
-	m_light->setDiffuseColor(0.5f, 0.5f, 0.5f, 1.0f);
-	m_light->setDirection(-3.0f, 5.0f, -4.0f);
-	m_light->setSpecularColor(1.0f, 1.0f, 1.0f, 1.0f);
+	m_light->setAmbientLight(0.30f, 0.30f, 0.30f, 1.0f);
+	m_light->setDiffuseColor(0.8f, 0.8f, 0.8f, 1.0f);
+	m_light->setDirection(0.0f, 0.0f, 1.0f);
+	m_light->setSpecularColor(0.8f, 0.8f, 0.8f, 1.0f);
 	m_light->setSpecularPower(16.0f);
 
-	if (!m_mesh->initialize(m_dx_api->getDxDevice(), m_dx_api->getDxDeviceContext(), (char*)"meshes/sphere.obj", (char*)"textures/metal_plate_color.tga", (char*)"textures/metal_plate_normals.tga", 0.0f))
+	if (!m_mesh->initialize(m_dx_api->getDxDevice(), m_dx_api->getDxDeviceContext(), (char*)"meshes/sphere.obj", (char*)"textures/metal_plate2_diffuse.tga", (char*)"textures/metal_plate2_normal.tga", 0.0f))
 	{
 		MessageBox(rendering_settings.window_handle, "Object initialization failed", "Error", MB_OK);
 		return false;

@@ -43,15 +43,15 @@ float4 pixelMain(PixelData pixel_input) : SV_TARGET
 
 	specular = float4(0.0f, 0.0f, 0.0f, 0.0f);
 	
-	light_dir = light_direction;
-	light_intensity = saturate(dot(bump_normal, light_direction));
+	light_dir = -light_direction;
+	light_intensity = saturate(dot(bump_normal, light_dir));
 	
 	if (light_intensity > 0.0f)
 	{
 		pixel_input.color += (diffuse_color * light_intensity);
 		pixel_input.color = saturate(pixel_input.color);
 		
-		reflection = normalize(2 * light_intensity * bump_normal - light_direction);
+		reflection = normalize(2 * light_intensity * bump_normal - light_dir);
 
 		specular = pow(saturate(dot(reflection, pixel_input.view_direction)), specular_strength);
 	}
